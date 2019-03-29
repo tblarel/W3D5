@@ -127,19 +127,24 @@ class SQLObject
     self.class.columns.each do |attr_name|
       set_arr <<  "#{attr_name} = ?"
     end
-    set_line = set_arr.join(", ")
+    line = set_arr.join(", ")
     
     DBConnection.execute(<<-SQL, *attribute_values, id)
       UPDATE
         #{self.class.table_name} 
       SET
-        #{set_line}
+        #{line}
       WHERE
-        #{self.class.table_name}.id = id    
+        #{self.class.table_name}.id = ?    
     SQL
   end
 
   def save
-    # ...
+    if id.nil?
+      self.insert
+    else
+      self.update
+    end
   end
+  
 end
